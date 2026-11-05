@@ -16,6 +16,8 @@ Ce rendu documente un laboratoire local isolé, réalisé le 4 novembre 2026. TI
 
 Consulter [la qualification](documentation/qualification-alertes.md), [la priorisation NOVA](documentation/priorisation-nova.md), [les KPI](documentation/kpi-dast.md), [les réponses](documentation/questions-reponses.md) et [les preuves de commandes](preuves/commandes-et-resultats.md).
 
+La CI GitHub Actions a aussi été vérifiée à distance avec succès : voir [la preuve CI et l'artefact](preuves/ci-distante-github-actions.md).
+
 ## Inventaire
 
 - `lab/docker-compose.yml` — Compose durci : app uniquement sur loopback, MongoDB non publié, service ZAP officiel.
@@ -24,6 +26,7 @@ Consulter [la qualification](documentation/qualification-alertes.md), [la priori
 - `ci/gitlab-ci.yml` — pipeline GitLab CI conçu pour un runner Docker-in-Docker autorisé.
 - `../.github/workflows/dast-zap.yml` — alternative GitHub Actions ne ciblant que le laboratoire du runner.
 - `documentation/` — analyse, fiches NOVA, KPI et réponses techniques.
+- `preuves/ci-distante-github-actions.md` — exécution CI distante réussie et vérification de l'artefact.
 
 ## Reproduction locale
 
