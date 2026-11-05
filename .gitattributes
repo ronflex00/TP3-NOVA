@@ -1,0 +1,3 @@
+# ZAP emits presentation whitespace in its unmodified evidence artifacts.
+RENDU_FINAL/reports/*.html -whitespace
+RENDU_FINAL/reports/*.json -whitespace

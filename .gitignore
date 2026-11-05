@@ -1,0 +1,6 @@
+# Upstream laboratory checkout: it includes intentionally insecure training material
+# and is rebuilt by the documented workflow; it is not a deliverable source tree.
+tiwap/
+
+# The distributable archive is generated from the tracked RENDU_FINAL directory.
+TP3_NOVA_RENDU_FINAL.zip

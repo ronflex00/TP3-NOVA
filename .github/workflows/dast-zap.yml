@@ -1,0 +1,54 @@
+name: DAST - ZAP Baseline (local TIWAP only)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, feat/tp3-zap-dast]
+  pull_request:
+
+jobs:
+  zap-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve the isolated training target
+        run: git clone --depth 1 https://github.com/tombstoneghost/TIWAP.git tiwap
+      - name: Apply host-local Compose configuration
+        run: |
+          cp RENDU_FINAL/lab/docker-compose.yml tiwap/docker-compose.yml
+          # TIWAP upstream enables HTTPS; the mandated in-network target is HTTP.
+          sed -i "s/app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=context)/app.run(host='0.0.0.0', port=5000, debug=True)/" tiwap/app.py
+          mkdir -p tiwap/reports
+      - name: Start local laboratory
+        working-directory: tiwap
+        run: docker compose up -d --build
+      - name: Wait for TIWAP inside its Compose network
+        working-directory: tiwap
+        run: |
+          for attempt in $(seq 1 30); do
+            if docker compose exec -T zap wget -qO- http://app:5000/ >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - name: Run passive baseline only
+        working-directory: tiwap
+        run: |
+          set +e
+          docker compose exec -T zap zap-baseline.py -t http://app:5000 -m 2 -r zap-report.html -J zap-report.json
+          zap_exit=$?
+          set -e
+          test "$zap_exit" -eq 0 -o "$zap_exit" -eq 2 || exit "$zap_exit"
+          echo "ZAP baseline exit code: $zap_exit"
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-reports
+          path: |
+            tiwap/reports/zap-report.html
+            tiwap/reports/zap-report.json
+          if-no-files-found: error
+      - name: Stop local laboratory
+        if: always()
+        working-directory: tiwap
+        run: docker compose down -v
