@@ -19,6 +19,8 @@ jobs:
           # TIWAP upstream enables HTTPS; the mandated in-network target is HTTP.
           sed -i "s/app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=context)/app.run(host='0.0.0.0', port=5000, debug=True)/" tiwap/app.py
           mkdir -p tiwap/reports
+          # The official ZAP image runs as a non-runner user; this directory is ephemeral.
+          chmod 777 tiwap/reports
       - name: Start local laboratory
         working-directory: tiwap
         run: docker compose up -d --build
